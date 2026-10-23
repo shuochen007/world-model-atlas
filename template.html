@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="从 VLM、VLA 出发，用交互实验理解 Diffusion、JEPA、Wan、Cosmos、DreamZero、LingBot-VA 与 GigaWorld。中文视频生成与世界模型学习图谱。">
+<meta name="theme-color" content="#f6f5f0"><title>World Model Atlas · 从生成到行动</title>
+<style>/* INLINE_CSS */</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<aside class="sidebar" id="sidebar">
+ <a class="brand" href="#top"><span class="brand-icon">◈</span><span>WORLD MODEL<br><b>ATLAS</b></span></a>
+ <div class="edition">交互学习手册 / 中文版</div>
+ <div class="nav-label">学习路线 <span>01 — 11</span></div>
+ <nav aria-label="章节导航">
+ <a href="#bridge"><i>01</i> 从你熟悉的模型出发</a><a href="#map"><i>02</i> 一张图，找到方向</a><a href="#diffusion"><i>03</i> 从噪声中生成</a><a href="#video"><i>04</i> 让图像进入时间</a><a href="#jepa"><i>05</i> JEPA：预测表征</a><a href="#world"><i>06</i> 什么才是世界模型</a><a href="#atlas"><i>07</i> 代表模型解剖室</a><a href="#wam"><i>08</i> 从世界预测到动作</a><a href="#compare"><i>09</i> 横向比较与选择</a><a href="#learn"><i>10</i> 检验你的理解</a><a href="#sources"><i>11</i> 术语与原始资料</a>
+ </nav>
+ <div class="sidebar-bottom"><div class="progress-caption"><span>阅读位置</span><span id="progress-text">0%</span></div><div class="progress-track"><div id="progress-fill"></div></div><p>一手资料核对<br><b>2026.10.23</b></p><button class="quiet" id="motion-toggle" aria-pressed="false">暂停装饰动画</button></div>
+</aside>
+<div class="topbar"><button id="menu-toggle" aria-expanded="false" aria-controls="sidebar" aria-label="打开目录">☰</button><span>FIELD NOTES <i>/</i> GENERATION → WORLD → ACTION</span><a href="#atlas">探索模型 <span>↗</span></a></div>
+<main id="main">
+<header class="hero" id="top">
+ <div class="hero-copy"><div class="eyebrow"><span class="status-dot"></span> 一份可以动手的世界模型指南</div><h1>从看见世界，<br>到<span>预测与行动。</span></h1><p class="hero-lead">你已经知道 VLM 如何理解、VLA 如何行动。<br>接下来，让我们拆开机器的“想象力”。</p><p class="hero-sub">从 Diffusion 的第一粒噪声，到 JEPA、Wan、Cosmos，再到真正输出动作的 WAM。用直觉起步，用机制把它们连接起来。</p><div class="hero-actions"><a class="button primary" href="#bridge">开始学习 <span>↓</span></a><a class="button secondary" href="#map">先看全局图谱 ↗</a></div><div class="hero-meta"><span>11 个章节</span><span id="model-count">代表模型</span><span>交互实验 · 可离线阅读</span></div></div>
+ <div class="hero-visual"><canvas id="hero-canvas" width="680" height="620" aria-label="生成、表征、世界预测与行动相互连接的动态示意图"></canvas><div class="visual-label top">A WORLD, IN REPRESENTATION.</div><div class="hero-node n1"><span>01 / GENERATE</span><b>生成可能的未来</b></div><div class="hero-node n2"><span>02 / PREDICT</span><b>预测世界的变化</b></div><div class="hero-node n3"><span>03 / ACT</span><b>把想象变成动作</b></div><div class="visual-label bottom">概念示意 · 非模型运行结果</div></div>
+</header>
+<div class="intro-strip"><span class="strip-mark">↳</span><p><b>先记住一个区别</b>　视频生成回答“可能看见什么”；动作条件世界模型回答“这样做会发生什么”；策略回答“现在应该做什么”。一个系统可以同时拥有这些能力。</p></div>
+
+<section id="bridge" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">01</span><div><div class="eyebrow">START WITH WHAT YOU KNOW</div><h2>同一张桌子，四种问题。</h2></div></div>
+ <p class="section-lead">假设机器人面前有一个橙色方块，任务是把它推到目标区。先不要看网络名字，先看它的<b>输入、输出和用途</b>。</p>
+ <div class="bridge-layout"><div class="lab dark"><div class="lab-top"><span>实验 01 / 模型的接口</span><span class="tag">教学示意</span></div><div class="segmented" id="bridge-tabs"><button data-mode="vlm" class="active">VLM</button><button data-mode="vla">VLA</button><button data-mode="wm">WM</button><button data-mode="wam">WAM</button></div><canvas id="bridge-canvas" width="800" height="380" aria-label="桌面推方块任务中，各类模型的输入与输出"></canvas><div class="terminal" id="bridge-output" aria-live="polite"></div></div><div class="explain" id="bridge-explain"></div></div>
+ <div class="note"><b>这些名字不在同一个分类层级。</b>Diffusion / Flow Matching 是生成建模方法，Transformer 是网络结构，JEPA 是表征预测范式；VLM / VLA / WM / WAM 更接近系统能力与接口。同一个 WAM 可以同时使用视频 Transformer、Flow Matching 和动作预测。</div>
+ <div class="reading-grid"><article><span class="mini-label">把 VLM 的直觉带过来</span><h3>视频 token 也是 token</h3><p>但它往往代表一块连续的视觉 latent，而不是词表中的一个文字编号。Transformer 可以处理它们；训练目标未必是“预测下一个词”。</p></article><article><span class="mini-label">把 VLA 的直觉带过来</span><h3>动作是可执行的数值</h3><p>例如末端位姿增量、关节角或夹爪开合。生成一段“手抓住杯子”的画面，并没有自动给出机器人所需的控制命令。</p></article><article><span class="mini-label">需要新建的直觉</span><h3>未来是一个分布</h3><p>同一画面可以有多个合理后续。采样模型选择其中一个；世界模型还要关心它在给定动作后是否成立，以及误差能否被真实观察纠正。</p></article></div>
+</section>
+
+<section id="map" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">02</span><div><div class="eyebrow">A MAP, NOT A LADDER</div><h2>三条路线，在机器人处交汇。</h2></div></div>
+ <p class="section-lead">这不是“Diffusion 被 JEPA 取代，再升级为 WAM”的历史。它们是可以交叉的研究路线。点击任意模型，进入它的解剖页。</p>
+ <div class="map-legend"><span><i class="dot orange"></i>生成像素 / latent</span><span><i class="dot purple"></i>学习预测表征</span><span><i class="dot green"></i>建模动力学与决策</span></div>
+ <div class="lineage" id="lineage"></div>
+ <p class="caption">连线表示教学上的概念联系；只有模型详情中明确标注的关系才表示实际权重继承。年份采用所讲版本的首次论文或官方发布年份。</p>
+</section>
+
+<section id="diffusion" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">03</span><div><div class="eyebrow">THE GENERATIVE ENGINE</div><h2>噪声，怎么变成一张图？</h2></div></div>
+ <p class="section-lead">把一张清晰图像逐渐弄脏很容易。Diffusion 的训练让网络学习：<b>在不同污染程度下，怎样朝数据分布的方向恢复</b>。生成时则从随机噪声出发，反复调用这个网络。</p>
+ <div class="lab diffusion-lab"><div class="lab-top"><span>实验 02 / 观察噪声日程</span><span class="tag">前向加噪可视化</span></div><div class="diffusion-frames"><div><canvas id="clean-canvas" width="320" height="240" aria-label="干净目标图像"></canvas><span>干净样本 x₀</span></div><span class="big-arrow">→</span><div><canvas id="noise-canvas" width="320" height="240" aria-label="当前噪声强度下的图像"></canvas><span id="noise-label">xτ · 噪声占比</span></div><span class="big-arrow">→</span><div><canvas id="pure-canvas" width="320" height="240" aria-label="接近纯噪声的图像"></canvas><span>高噪声端 ε</span></div></div><div class="control-row"><label for="noise-range">噪声时间 τ</label><input id="noise-range" type="range" min="0" max="100" value="46"><output id="noise-value">0.46</output><button class="button small" id="denoise-play">▶ 反向播放示意</button></div><p class="caption">拖动显示解析加噪形式（映射到 RGB 时会裁剪超出范围的值）。反向播放只倒放同一条已知样本轨迹；真正生成必须用训练好的网络估计方向，本页不运行神经网络。</p></div>
+ <div class="two-col"><article><h3>训练：有答案的练习</h3><ol class="steps"><li>抽一张真实图像 x₀，再随机抽一个噪声时间 τ。</li><li>采样高斯噪声 ε，把它和图像按比例混合。</li><li>网络接收 xτ、τ 和条件 c，预测加进去的噪声。</li><li>与已知 ε 比较，更新网络。每个训练样本不必走完整条去噪链。</li></ol></article><article><h3>推理：从无到有的采样</h3><ol class="steps"><li>先采样一张纯噪声；此时没有“原图”藏在里面。</li><li>按调度器从高噪声走向低噪声，多次评估网络。</li><li>每一步利用预测更新当前样本，逐渐形成结构。</li><li>换随机种子，可以得到同一提示词下的不同结果。</li></ol></article></div>
+ <details class="math"><summary>展开一层数学：DDPM 在学什么？</summary><div><code>xτ = √ᾱτ · x₀ + √(1 − ᾱτ) · ε</code><p>ᾱτ 是保留下来的信号比例；τ 越大，通常信号越少。经典噪声预测损失是 <code>E ‖ε − εθ(xτ, τ, c)‖²</code>。这是最常见的讲解参数化之一；实际模型也可以预测干净样本、速度或 score。DDPM 反向采样含随机性，DDIM 和概率流 ODE 等提供不同采样路线。<a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">DDPM 原文 ↗</a></p></div></details>
+ <h3 class="subsection-title">Flow Matching：学会给每个点指路。</h3>
+ <p>很多现代视频模型把“去噪”的直觉保留下来，但用 Flow Matching 训练一个速度场。以下采用 <b>τ=0 是噪声，τ=1 是数据</b> 的约定，与上面加噪滑块方向不同。</p>
+ <div class="lab dark flow-lab"><div class="lab-top"><span>实验 03 / 从噪声分布搬运到数据分布</span><span class="tag">二维解析示意</span></div><div class="canvas-scroll" tabindex="0" aria-label="可横向滚动的交互图"><canvas id="flow-canvas" width="1100" height="310" aria-label="二维点云沿向量场从噪声分布移动到三个目标簇"></canvas></div><div class="control-row"><label for="flow-range">生成时间 τ</label><input id="flow-range" type="range" min="0" max="100" value="35"><output id="flow-value">0.35</output><button id="flow-play" class="button small">▶ 播放搬运</button></div></div>
+ <div class="two-col"><article><h3>它与 Diffusion 的联系</h3><p>两者都把简单噪声分布变成复杂数据分布，都可多步采样，也能共享 DiT 主干。Flow Matching 回归概率路径上的速度场；它支持不同路径，包含与扩散有关的路径。两者不是简单的“旧版和新版”。</p></article><article><h3>直线路径，不等于一次到终点</h3><p>常见训练路径写作 <code>xτ=(1−τ)ε+τx</code>，目标速度为 <code>x−ε</code>。网络并不知道每个噪声对应哪个最终样本，学到的是条件平均速度；积分轨迹通常仍需多次网络评估。</p></article></div>
+ <p class="source-inline">机制依据：<a href="https://arxiv.org/abs/2210.02747" target="_blank" rel="noopener">Flow Matching</a>；图中的三簇与配对均为人为构造，不是训练结果。</p>
+ <div class="note"><b>两个“时间”一定要分开：</b>视频时间 t 表示第几帧；噪声时间 τ 表示采样去到了哪一级噪声。视频的第 20 帧，也可以处在第 5 次去噪迭代中。</div>
+</section>
+
+<section id="video" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">04</span><div><div class="eyebrow">SPACE × TIME × TOKENS</div><h2>从一张图，到一个时空体。</h2></div></div>
+ <p class="section-lead">逐帧独立生成会让物体外形和运动不断漂移。视频模型要让不同位置、不同时间的信息互相交流，学会同一个物体如何持续变化。</p>
+ <div class="pipeline-wide"><div><em>01</em><b>像素视频</b><small>T × H × W × 3</small></div><span>→</span><div><em>02</em><b>视频 VAE</b><small>压缩时间与空间</small></div><span>→</span><div><em>03</em><b>latent patches</b><small>连续向量 token</small></div><span>→</span><div><em>04</em><b>DiT 去噪 / 流</b><small>条件化的 Transformer</small></div><span>→</span><div><em>05</em><b>VAE 解码</b><small>还原可观看视频</small></div></div>
+ <div class="two-col"><article><h3>VAE：先缩小工作空间</h3><p>编码器把像素压成 latent，解码器再将它重建。压缩降低生成计算量，但可能损失手指、小物体、接触边缘等细节。用于重建视频的 latent，也不自动就是最适合动作控制的表征。</p></article><article><h3>DiT：换的是去噪网络骨架</h3><p>Diffusion Transformer 用 Transformer 处理噪声 latent patches。它可以让 token 相互注意，并融合文本、噪声时间等条件。<b>用了 Transformer 不代表逐 token 自回归</b>：整段视频也可以被同时迭代更新。</p></article></div>
+ <div class="lab dark"><div class="lab-top"><span>实验 04 / 谁能看见谁？</span><span class="tag">简化注意力图</span></div><div class="segmented" id="attention-tabs"><button class="active" data-mode="spatial">逐帧独立</button><button data-mode="full">全时空注意力</button><button data-mode="causal">因果时序</button></div><div class="canvas-scroll" tabindex="0" aria-label="可横向滚动的交互图"><canvas id="attention-canvas" width="1080" height="340" aria-label="三帧视频的 token 和空间、跨时间、因果注意力连接"></canvas></div><p class="lab-description" id="attention-description"></p><div class="control-row"><label for="token-frames">latent 帧数</label><input id="token-frames" type="range" min="2" max="16" value="4"><output id="token-value">4</output><div class="metric">token: <b id="token-number">256</b></div><div class="metric">稠密配对项: <b id="token-square">65,536</b></div></div><p class="caption">计算器固定每帧 8×8 个 patches，N=T′×8×8；N² 只表示注意力配对规模，不代表完整 FLOPs、显存或具体模型速度。画面仅展示 3 帧×9 个 token。</p></div>
+ <details><summary>初学者最容易漏掉的四个训练细节</summary><div class="detail-grid"><article><h4>文本条件</h4><p>文本编码器将提示词转成表示；通过 cross-attention 或联合序列等方式影响视觉生成。更准确的视频描述能改善动作和语义对齐。</p></article><article><h4>Classifier-free guidance</h4><p>组合有条件与无条件预测来增强条件遵循。引导过强可能损害多样性或质量；不同模型也可能通过蒸馏等方式改变推理配置。</p></article><article><h4>数据比架构名字更具体</h4><p>切镜头、去低质量片段、控制运动量、重写 caption、过滤重复样本都会影响结果。“模型更大”不是完整训练配方。</p></article><article><h4>因果不只有一种含义</h4><p>VAE 的因果卷积、Transformer 的时间掩码、动作与后果的关系是不同概念。只写“causal”不能证明模型学到了真实因果机制。</p></article></div></details>
+ <p class="source-inline">代表工作：<a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">LDM</a> · <a href="https://arxiv.org/abs/2212.09748" target="_blank" rel="noopener">DiT</a> · <a href="https://arxiv.org/abs/2204.03458" target="_blank" rel="noopener">Video Diffusion Models</a> · <a href="https://arxiv.org/abs/2408.06072" target="_blank" rel="noopener">CogVideoX</a></p>
+</section>
+
+<section id="jepa" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">05</span><div><div class="eyebrow">PREDICT THE REPRESENTATION</div><h2>JEPA：不必把每片叶子画出来。</h2></div></div>
+ <p class="section-lead">如果目标是理解“球向右滚了”，模型也许不需要逐像素还原草地纹理。JEPA 让一个网络根据已见内容，预测另一部分内容的<b>内部表征</b>。</p>
+ <div class="lab jepa-lab"><div class="lab-top"><span>实验 05 / 预测目标的差别</span><span class="tag">表征内容为示意</span></div><div class="segmented light" id="jepa-tabs"><button data-mode="pixel">像素重建</button><button data-mode="feature" class="active">JEPA 表征预测</button></div><div class="jepa-scene"><div class="canvas-scroll" tabindex="0" aria-label="可横向滚动的交互图"><canvas id="jepa-canvas" width="1050" height="330" aria-label="遮挡的视频片段经过上下文与目标编码器，在特征空间比较"></canvas></div></div><div class="control-row"><label for="texture-range">无关纹理变化</label><input id="texture-range" type="range" min="0" max="100" value="35"><output id="texture-value">35</output></div><p class="lab-description" id="jepa-description"></p></div>
+ <div class="two-col"><article><h3>训练时，目标从哪里来？</h3><p>上下文编码器只看未遮挡部分；预测器结合目标位置，预测被遮挡部分的 embedding。目标编码器可看完整输入，提供监督目标。目标分支停止梯度，并通常由上下文编码器参数的指数移动平均更新。</p><p>这属于自监督学习：标签来自数据本身，而不是人工为每一帧标注物体。掩码、目标网络、优化等设计共同影响能否学到有用表示，不能把“不坍塌”归结为单个按钮。</p></article><article><h3>它没有承诺什么？</h3><p>特征不是人手指定的“位置、速度”表格；图中为了教学只画出示意向量条。JEPA 不保证完美忽略所有无关纹理，也不自动获得机器人控制能力。</p><p>I-JEPA 在图像上预测被遮挡区域；V-JEPA 扩展到视频时空区域。遮挡视频重建式预训练未必严格只从过去预测未来，因此不能把所有 V-JEPA 都称为动作条件动力学模型。</p></article></div>
+ <div class="jepa-evolution"><button data-open-model="ijepa"><span>2023</span><b>I-JEPA</b><small>图像区域 → 区域表征</small></button><span>→</span><button data-open-model="vjepa"><span>2024</span><b>V-JEPA</b><small>可见时空 → 遮挡表征</small></button><span>→</span><button data-open-model="vjepa2"><span>2025</span><b>V-JEPA 2 / 2-AC</b><small>视频表征 → 动作条件规划</small></button></div>
+ <div class="note purple-note"><b>V-JEPA 2-AC 是关键桥梁。</b>在视频表征学习之后加入带动作的机器人数据，学习动作条件预测；规划器尝试候选动作，比较预测结果与目标的表征距离，再执行部分动作并重规划。其控制实验不等于“只看互联网视频，就自然获得任意机器人的零样本动作能力”。</div>
+ <p class="source-inline">原始资料：<a href="https://arxiv.org/abs/2301.08243" target="_blank" rel="noopener">I-JEPA</a> · <a href="https://arxiv.org/abs/2404.08471" target="_blank" rel="noopener">V-JEPA</a> · <a href="https://github.com/facebookresearch/vjepa2" target="_blank" rel="noopener">V-JEPA 2 官方代码与论文入口</a></p>
+</section>
+
+<section id="world" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">06</span><div><div class="eyebrow">WHAT IF I DO THIS?</div><h2>“看起来合理”，离“可用于决策”还有多远？</h2></div></div>
+ <p class="section-lead">世界模型的用法很宽。这里把<b>视觉世界先验</b>与<b>用于控制的动作条件动力学</b>分开：前者学习常见世界如何演化，后者还要预测指定动作的后果。</p>
+ <div class="formula-row"><div><span>视频生成</span><code>p(未来视频 | 文本, 已知帧)</code></div><div><span>动作条件世界模型</span><code>p(sₜ₊₁ | s≤ₜ, a≤ₜ)</code></div><div><span>策略</span><code>π(aₜ | 观察, 目标)</code></div></div>
+ <p>s 可以是像素、latent 或隐状态。真实环境常常只能部分观测，因此历史和记忆也很重要。规划时，模型会被用来回答“如果我执行候选动作 A 或 B，哪个未来更接近目标？”</p>
+ <div class="lab dark"><div class="lab-top"><span>实验 06 / 反事实与模型误差</span><span class="tag">一维滑块动力学 · 非神经网络</span></div><div class="canvas-scroll" tabindex="0" aria-label="可横向滚动的交互图"><canvas id="world-canvas" width="1080" height="340" aria-label="在不同力度与摩擦下，预测轨迹和真实轨迹的差异"></canvas></div><div class="world-controls"><label for="force-range">推力 <output id="force-value">55</output><input id="force-range" type="range" min="10" max="100" value="55"></label><label for="friction-range">真实摩擦 <output id="friction-value">0.50</output><input id="friction-range" type="range" min="10" max="90" value="50"></label><label for="horizon-range">想象步数 <output id="horizon-value">8</output><input id="horizon-range" type="range" min="2" max="16" value="8"></label></div><p class="lab-description" id="world-description"></p><p class="caption">橙线为始终假设摩擦=0.50的模型；青线为滑块指定摩擦的环境。两条轨迹共用同一推力、初始状态与简化衰减方程。它只演示误差累积，不模拟接触物理，也不是任何论文的性能曲线。</p></div>
+ <div class="reading-grid"><article><span class="mini-label">视觉世界先验</span><h3>Wan / Cosmos</h3><p>通过视频生成学习动态、物体与场景。Wan 的通用生成版本不天然带机器人动作接口；Cosmos 是包含生成、转换与推理等组件的平台，具体能力取决于版本和条件接口。</p></article><article><span class="mini-label">可交互环境</span><h3>Genie 系列</h3><p>动作输入影响下一步画面，可以作为交互世界。早期 Genie 学到的潜在动作不同于标定后的机器人控制量；能控制屏幕中的角色不等于能驱动真实机械臂。</p></article><article><span class="mini-label">在想象中学习策略</span><h3>DreamerV3</h3><p>先学习潜在动力学与奖励，再在模型想象出的轨迹上训练 actor-critic。世界模型服务于强化学习；它不要求每次决策都先渲染一段高清视频。</p></article></div>
+ <details><summary>读“world model”论文时，问这五个问题</summary><ol class="steps"><li><b>预测什么？</b>像素、embedding、奖励、动作，还是联合输出？</li><li><b>条件是什么？</b>文本、相机运动、离散按键、真实关节动作，还是没有动作？</li><li><b>怎么使用？</b>直接当策略、搜索候选动作、训练策略，还是只造数据？</li><li><b>误差怎么处理？</b>是否真实反馈、短视野重规划、不确定性或多样本评估？</li><li><b>验证在哪里？</b>视频指标、交互任务、仿真控制、真实机器人，是否见过相同任务与环境？</li></ol></details>
+</section>
+
+<section id="atlas" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">07</span><div><div class="eyebrow">THE MODEL OBSERVATORY</div><h2>代表模型，逐个拆开。</h2></div></div>
+ <p class="section-lead">选择模型，再点击流程节点。每一张卡都回答同样的问题：<b>它吃什么、学什么、怎样生成或决策，以及它还做不到什么。</b></p>
+ <div class="atlas-toolbar"><label class="search-box"><span>⌕</span><input id="model-search" type="search" placeholder="搜索模型、方法或关键词…" aria-label="搜索模型"></label><div class="filter-buttons" id="model-filters"><button class="active" data-filter="all">全部</button><button data-filter="gen">生成</button><button data-filter="rep">表征</button><button data-filter="wm">世界</button><button data-filter="wam">动作</button></div></div>
+ <div class="atlas-layout"><div id="model-list" class="model-list" aria-label="模型列表"></div><article id="model-detail" class="model-detail" aria-live="polite"></article></div>
+</section>
+
+<section id="wam" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">08</span><div><div class="eyebrow">IMAGINATION MEETS CONTROL</div><h2>WAM：同时考虑未来与动作。</h2></div></div>
+ <p class="section-lead">典型 VLA 把视觉、语言映射为动作；视频式 WAM 把<b>世界的未来变化</b>也放进学习目标。希望借助视频先验，把“要达到的场景变化”与“可执行动作”对齐。</p>
+ <div class="note"><b>WAM 是正在发展的用语，不是统一标准。</b>下面讨论视频—动作联合建模路线。VLA 也可以使用扩散、Flow Matching、视频预训练或未来预测辅助损失；“VLA 只懂语义、WAM 才懂物理”是过度简化。</div>
+ <p class="source-inline">先补三块拼图：<a href="#model-diffpolicy" data-open-model="diffpolicy">Diffusion Policy：直接生成动作</a> · <a href="#model-unipi" data-open-model="unipi">UniPi：视频计划接逆动力学</a> · <a href="#model-videovla" data-open-model="videovla">VideoVLA：联合预测视频与动作</a>。这些工作说明，“VLA”与“WAM”之间并没有一条按名称划定的硬边界。</p>
+ <div class="lab dark wam-lab"><div class="lab-top"><span>实验 07 / 三种模型的推理组织</span><span class="tag">机制示意 · 非耗时比例</span></div><div class="segmented" id="wam-tabs"><button class="active" data-mode="dreamzero">DreamZero</button><button data-mode="lingbot">LingBot-VA</button><button data-mode="giga">GigaWorld-Policy</button></div><div id="wam-sequence"></div><div class="control-row"><button class="button small" id="wam-prev">← 上一步</button><input id="wam-step" aria-label="WAM 流程步骤" type="range" min="0" max="4" value="0"><button class="button small" id="wam-next">下一步 →</button></div><p class="lab-description" id="wam-explanation" aria-live="polite"></p></div>
+ <div class="reading-grid" id="wam-summaries"></div>
+ <details class="math"><summary>再深入一层：为什么联合建模能有三种不同推理顺序？</summary><div><p>记 h 为观察历史，l 为指令，v 为未来视觉，a 为动作。要建模的是 <code>p(v, a | h, l)</code>。联合分布可以用不同条件依赖来组织：</p><div class="formula-row"><div><span>视觉在前</span><code>p(v | h,l) · p(a | h,l,v)</code><p>先构造视觉未来，再由视觉转移预测动作。可用来理解 LingBot-VA 的逆动力学联系。</p></div><div><span>联合采样</span><code>联合更新 (v, a)</code><p>让未来视频与动作在共同的生成过程中相互约束。可用来理解 DreamZero 的联合视频—动作块。</p></div><div><span>动作在前</span><code>p(a | h,l) · p(v | h,l,a)</code><p>视频任务在训练中约束动作相关动态；部署时可以只采样动作边缘分布。GigaWorld-Policy 采用这一类思路。</p></div></div><p>这些是教学用的概率分解。实际实现还包括噪声时间、模态损失权重、token 掩码与缓存。形式上能写出分解，并不表示任意已训练模型都能随意切换采样顺序。</p></div></details>
+ <h3 class="subsection-title">为什么闭环和异步，与模型架构一样重要？</h3>
+ <p>机器人执行动作时，真实世界还在变化。如果生成一整段动作后很久才看新图像，预测和现实可能逐渐分离。闭环控制不断注入真实观察；异步执行让部分推理和电机执行重叠，以减少等待，但也必须处理观察变旧的问题。</p>
+ <div class="lab timing-lab"><div class="lab-top"><span>实验 08 / 控制时序</span><span class="tag">教学时间单位</span></div><div class="segmented light" id="loop-tabs"><button data-mode="open">开环执行</button><button data-mode="closed" class="active">闭环重规划</button><button data-mode="async">异步流水线</button></div><div id="timing-chart"></div><p id="timing-explanation" class="lab-description"></p></div>
+ <div class="two-col"><article><h3>训练中联合，不一定推理时同步</h3><p>可以对视频和动作共同施加损失，却在推理中先生成视觉未来，再条件化生成动作；也可以联合去噪一段动作和视频。注意力掩码决定谁能依赖谁，运行调度决定实际先算谁。</p></article><article><h3>更好视频，也不自动等于更好控制</h3><p>动作时间对齐、相机标定、本体差异、控制频率与接触精度都会影响真机成功率。世界预测错了，动作可能忠实地执行一个错误未来。长时程任务尤其需要真实反馈。</p></article></div>
+ <details><summary>进一步理解：前向动力学、逆动力学、策略</summary><div class="formula-row"><div><span>前向动力学</span><code>(当前状态, 动作) → 后续状态</code><p>告诉你“这样做的后果”。</p></div><div><span>逆动力学</span><code>(当前状态, 后续状态) → 动作</code><p>推断“怎样实现这个转移”。</p></div><div><span>策略</span><code>(观察历史, 任务) → 动作</code><p>告诉你“现在执行什么”。</p></div></div><p>同一网络可以承担多个条件分布，但三种问题仍需区分。逆动力学可能是一对多：达到同一视觉状态有不止一种动作，遮挡也会使动作难以唯一确定。</p></details>
+</section>
+
+<section id="compare" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">09</span><div><div class="eyebrow">COMPARE THE INTERFACES</div><h2>比较问题，不盲排能力。</h2></div></div>
+ <p class="section-lead">不同论文的数据、本体、任务与成功率定义不相同。下面比较的是方法接口，<b>不把不同 benchmark 的百分比排成总榜</b>。</p>
+ <div class="table-wrap"><table><thead><tr><th>路线 / 代表</th><th>主要输出</th><th>动作如何进入</th><th>如何用于机器人</th><th>最容易误读</th></tr></thead><tbody id="comparison-body"></tbody></table></div>
+ <div class="question-router"><div><span class="eyebrow">CHOOSE YOUR QUESTION</span><h3>你真正想解决什么？</h3><label for="goal-select" class="sr-only">选择学习目标</label><select id="goal-select"><option value="video">我想生成高质量视频</option><option value="rep">我想学视频的可迁移表征</option><option value="simulate">我想预测指定动作的结果</option><option value="policy">我想让机器人输出动作</option><option value="data">我想用世界模型造训练数据</option></select></div><div id="goal-answer" aria-live="polite"></div></div>
+</section>
+
+<section id="learn" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">10</span><div><div class="eyebrow">MAKE IT YOUR OWN</div><h2>把概念，变成自己的判断。</h2></div></div>
+ <div class="study-path"><div><span>第一遍 · 约 20 分钟</span><h3>建立直觉</h3><p>先读 01–06，实际拖动每个实验。能解释“噪声时间”和“视频时间”的区别，再进入具体模型。</p></div><div><span>第二遍 · 约 40 分钟</span><h3>沿一条路线深挖</h3><p>生成：DDPM → LDM → DiT → Wan。<br>表征：I-JEPA → V-JEPA → V-JEPA 2。<br>控制：Dreamer → DreamZero / LingBot-VA。</p></div><div><span>第三遍 · 带着问题读论文</span><h3>追到可复现细节</h3><p>画出输入输出、注意力掩码与推理时序；再查训练数据、动作维度、延迟、评估划分和失败案例。</p></div></div>
+ <div class="quiz-header"><h3>六个问题，检查关键误区</h3><span id="quiz-score">已回答 0 / 6</span></div><div id="quiz"></div>
+ <div class="pitfalls"><h3>读新论文时，保留这四个习惯</h3><p><b>区分模型与平台。</b>Cosmos、GigaWorld 是家族名字；具体版本与用途要单独核对。</p><p><b>区分 zero-shot 的对象。</b>未见任务、未见场景、未见物体、未见本体是不同设置；也要查是否进行过本体适配。</p><p><b>区分实时的口径。</b>视频 FPS、策略重规划 Hz、电机控制 Hz 和端到端延迟不能互换。</p><p><b>区分可视化与证据。</b>好看的 rollout 不能替代重复实验、失败统计、严格的测试划分和对照。</p></div>
+</section>
+
+<section id="sources" class="chapter">
+ <div class="chapter-head"><span class="chapter-number">11</span><div><div class="eyebrow">KEEP EXPLORING</div><h2>术语随查，结论可追溯。</h2></div></div>
+ <p class="section-lead">正文与模型卡片依据论文、官方项目页和官方仓库编写。较新的版本单独列出，避免把后续能力倒灌到初版模型中。</p>
+ <label class="search-box glossary-search"><span>⌕</span><input id="glossary-search" type="search" placeholder="查找术语，例如 latent、MoT、闭环…" aria-label="搜索术语"></label><div id="glossary" class="glossary-grid"></div>
+ <h3 class="subsection-title">一手资料索引</h3><div id="source-list" class="source-list"></div>
+ <div class="method-note"><h3>这份教程的边界</h3><p>核对日期：2026 年 10 月 23 日。内容围绕典型路线建立理解，并非完整文献综述或实时排行榜。交互图、曲线和时序均为原创教学示意，不包含实际模型推理，不代表论文实验数据。对于只公布部分细节的系统，明确保留未知项。公开演示请通过各模型的官方项目链接观看。</p><p>“Lingbo-VA”在本教程中按官方名称 <b>LingBot-VA</b> 解释；“Giga-World”拆分为世界模型家族与 <b>GigaWorld-Policy</b>。阅读位置和测验作答仅保存在当前浏览器；页面没有分析追踪或外部运行依赖。</p></div>
+</section>
+<footer><a class="brand-footer" href="#top">◈ WORLD MODEL ATLAS</a><span>理解生成，理解预测，再理解行动。</span><a href="#top">回到起点 ↑</a></footer>
+</main><div id="toast" role="status"></div>
+<script>/* INLINE_DATA */</script><script>/* INLINE_APP */</script>
+</body></html>
